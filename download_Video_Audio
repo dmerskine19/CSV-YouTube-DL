@@ -1,0 +1,34 @@
+from pytube import YouTube
+import os
+
+def download_audio(video_id, output_path):
+    try:
+        yt = YouTube(f"https://www.youtube.com/watch?v={video_id}")
+        stream = yt.streams.filter(only_audio=True).first()
+        if not os.path.exists(output_path):
+            os.makedirs(output_path)
+        stream.download(output_path)
+        
+        print(f"Downloaded audio: {yt.title}")
+        
+    except Exception as e:
+        print(f"Failed to download audio: {e}")
+        return None
+
+def download_audios_from_txt_files(folder_path, output_folder):
+    txt_files = [f for f in os.listdir(folder_path) if f.endswith('.txt')]
+    for txt_file in txt_files:
+        with open(os.path.join(folder_path, txt_file), 'r') as f:
+            video_ids = [line.strip() for line in f.readlines()]
+        category_folder = os.path.join(output_folder, os.path.splitext(txt_file)[0])
+        os.makedirs(category_folder, exist_ok=True)
+        for video_id in video_ids:
+            download_audio(video_id, category_folder)
+
+if __name__ == "__main__":
+    folder_path = 'category_ids'
+    output_folder = 'downloaded_audios'
+
+    download_audios_from_txt_files(folder_path, output_folder)
+
+    print("All audios downloaded.")

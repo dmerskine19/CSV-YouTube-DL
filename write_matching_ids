@@ -1,0 +1,26 @@
+def write_matching_ids_for_each_category(dataset_file, target_labels_file):
+    with open(target_labels_file, 'r') as f:
+        target_labels = [line.strip() for line in f.readlines()]
+
+    with open(dataset_file, 'r') as f:
+        lines = f.readlines()
+
+    for target_label in target_labels:
+        matching_ids = []
+        for line in lines:
+            parts = line.strip().split(',')
+            if target_label in parts:
+                matching_ids.append(parts[0])
+        output_file = os.path.join(f'category_ids/-{target_label.replace("/", "_")}.txt')
+        with open(output_file, 'w') as f:
+            for id in matching_ids:
+                f.write(id + '\n')
+
+if __name__ == "__main__":
+    import os
+    
+    dataset_file = 'unbalanced_train_segments.csv'
+    target_labels_file = 'category_ids.txt'
+
+    write_matching_ids_for_each_category(dataset_file, target_labels_file)
+    print("Matching IDs for each target label written to separate files.")
